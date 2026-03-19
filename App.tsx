@@ -1,64 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, View, TextInput } from 'react-native';
-import {get, set} from 'lodash'
+// I decided to use the set function from lodash as it is what I would use for safely accessing nested
+// Javascript object calls in a dynamic way in a production setting.
+import {set} from 'lodash'
 
 export default function App() {
-  const [inputText, setInputText] = useState("(id, name, email, type(id, name, customFields(c1, c2, c3)), externalId)")
+  const [inputText, setInputText] = useState("")
   const [parsedText, setParsedText] = useState("");
-
-  // function parseFieldString(isAlphabetical = false){
-  //   let displayString = "";
-  //   let currentSubstring = "";
-  //   let currentIndentation = 0;
-  //   let indentationToRemove = 0;
-  //   // The trailing spaces after the commas aren't useful for us so they can be removed
-  //   let inputTextNoSpace = inputText.replaceAll(', ', ',');
-  //   for(let i = 0; i < inputTextNoSpace.length; i++){
-  //     const currChar = inputTextNoSpace[i];
-  //     switch(currChar){
-  //       case '(':
-  //         currentSubstring = addCurrentSubstring(currentSubstring, currentIndentation)
-  //         displayString += currentSubstring;
-  //         currentSubstring = '';
-  //         currentIndentation -= indentationToRemove;
-  //         indentationToRemove = 0;
-  //         currentIndentation ++;
-  //         break;
-  //       case ')':
-  //         indentationToRemove ++;
-  //         break;
-  //       case ',':
-  //         currentSubstring = addCurrentSubstring(currentSubstring, currentIndentation)
-  //         displayString += currentSubstring;
-  //         currentSubstring = '';
-  //         currentIndentation -= indentationToRemove;
-  //         indentationToRemove = 0;
-  //         break;
-  //       default:
-  //         currentSubstring += currChar;
-  //         break;
-  //     }
-  //   }
-  //   if(currentSubstring){
-  //     currentSubstring = addCurrentSubstring(currentSubstring, currentIndentation)
-  //     displayString += currentSubstring;
-  //   }
-  //   setParsedText(displayString);
-  //   return displayString;
-  // }
-
-  // function addCurrentSubstring(currentSubstring: string, currentIndentation: number,){
-  //   if(currentSubstring === ''){
-  //     return '';
-  //   }
-  //   currentSubstring = "- " + currentSubstring;
-  //   for(var j = 0; j < currentIndentation; j++){
-  //     currentSubstring = "  " + currentSubstring;
-  //   }
-  //   currentSubstring += '\n';
-  //   return currentSubstring;
-  // }
 
   function parseFieldStringAlphabetical(isAlphabetical = false){
     let currentSubstring = "";
@@ -72,6 +21,8 @@ export default function App() {
         case '(':
           if(currentSubstring){
             if(currentObjectPath){
+              // If we are opening a new parentheses we need to add the current string to our path in order to be able
+              // to nest our objects to the correct parents
               currentObjectPath += '.'+ currentSubstring;
             }
             else{
@@ -93,7 +44,7 @@ export default function App() {
             }
           }
 
-          // remove the most recently added element 
+          // remove the most recently added element from our path string
           let splitPath = currentObjectPath.split('.');
           splitPath.pop();
           currentObjectPath = splitPath.join('.')
@@ -133,7 +84,6 @@ function buildDisplayStringFromObject(obj: object, displayString: string, depth:
   const keys = Object.keys(obj) as Array<keyof typeof obj>;
   for(var i = 0; i < keys.length; i++){
     displayString += '  '.repeat(depth) + '- ' + keys[i] + '\n'
-    console.log(displayString)
     if(typeof obj[keys[i]] === 'object' && obj[keys[i]] !== null){
       displayString = buildDisplayStringFromObject(obj[keys[i]], displayString, depth + 1)
     }
@@ -147,9 +97,9 @@ if (obj !== null && typeof obj === 'object') {
   const keys = Object.keys(obj) as Array<keyof typeof obj>;
     return keys
       .sort()
-      .reduce((acc: Record<string, any>, key) => {
-        acc[key] = sortObjectKeys(obj[key]);
-        return acc;
+      .reduce((accumulator: Record<string, any>, key) => {
+        accumulator[key] = sortObjectKeys(obj[key]);
+        return accumulator;
       }, {});
   }
   else{
@@ -183,15 +133,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    // alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 25
+    paddingHorizontal: 25,
+    rowGap: 20
   },
   buttonContainer: {
     flexDirection: 'row',
     columnGap: 30
   },
   input: {
-    borderWidth: 1
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 16
   }
 });
