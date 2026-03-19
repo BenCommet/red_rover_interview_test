@@ -11,3 +11,4 @@
 * I kept the styling simple with mobile in mind, it looks a bit off on the web but it gets the job done!
 * If you have any questions, don't hesitate to reach out to me at bencommet@gmail.com
 * Finally, thank you so much for taking the time to review my code! Thanks for the fun problem and I hope to have the opportunity to speak with you all again soon.
+* In a production application the functionality would be pulled out into a controller or a utils folder but for ease of review I just kept everything in the App.tsx.
